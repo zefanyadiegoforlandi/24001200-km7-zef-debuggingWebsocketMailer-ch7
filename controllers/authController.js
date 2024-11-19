@@ -58,7 +58,7 @@ class AuthController {
       });
 
       if (!user) {
-        return res.status(400).json({ message: 'Email not registered' });
+        return res.status(400).json({ message: 'Invalid email or password' });
       }
 
       const isPasswordValid = await bcrypt.compare(password, user.password);
