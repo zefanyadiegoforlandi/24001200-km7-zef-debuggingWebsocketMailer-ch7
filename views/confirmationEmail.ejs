@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <title>Confirm Your Email</title>
+</head>
+<body class="flex items-center justify-center h-screen bg-gray-100">
+  <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+    <h1 class="text-2xl font-semibold mb-6 text-center">Confirm Your Email</h1>
+    <form id="confirmationForm" class="space-y-4">
+      <input type="hidden" name="token" value="<%= token %>" />
+      <div>
+        <label for="email" class="block text-gray-700">Email</label>
+        <input type="email" id="email" name="email" required
+          class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500">
+      </div>
+      <button type="submit" class="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600">Confirm Email</button>
+    </form>
+
+    <p class="mt-4 text-center text-gray-500">
+      Didn't request this? <a href="#" class="text-blue-500 hover:underline">Contact Support</a>.
+    </p>
+
+    <div id="notification" class="hidden p-4 mt-4 text-white rounded">
+      <p id="notificationMessage"></p>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+<script>
+    const socket = io('http://localhost:3000');
+
+    const notification = document.getElementById('notification');
+    const notificationMessage = document.getElementById('notificationMessage');
+
+    socket.on('notification', (message) => {
+        notification.classList.remove('hidden');
+        notification.classList.remove('bg-red-500', 'bg-yellow-500', 'bg-green-500');
+
+        if (message.toLowerCase().includes('success')) {
+            notification.classList.add('bg-green-500');
+        } else if (message.toLowerCase().includes('wait')) {
+            notification.classList.add('bg-yellow-500');
+        } else if (message.toLowerCase().includes('reset')) {
+            notification.classList.add('bg-green-500');
+        } else {
+            notification.classList.add('bg-red-500');
+        }
+
+        notificationMessage.textContent = message;
+    });
+
+    document.getElementById('confirmationForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const formData = new FormData(this);
+        const data = {
+            token: formData.get('token'),
+            email: formData.get('email')
+        };
+
+        socket.emit('notification', 'Please wait, confirming your email...'); // Kirim notifikasi 'please wait'
+
+        fetch('/api/password/confirm-email', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        })
+        .then(response => {
+            if (response.ok) {
+                response.json().then(result => {
+                    const newToken = result.newToken;
+                    socket.emit('notification', 'Email confirmed successfully!'); // Kirim notifikasi sukses
+                    setTimeout(() => {
+                        window.location.href = `/reset-password?newToken=${newToken}`; // Redirect ke halaman reset-password
+                    }, 1000);
+                });
+            } else {
+                response.json().then(data => {
+                    socket.emit('notification', data.message || 'Error in email confirmation!'); // Kirim notifikasi error
+                });
+            }
+        })
+        .catch(() => {
+            socket.emit('notification', 'Error in email confirmation!'); // Kirim notifikasi error jika fetch gagal
+        });
+    });
+</script>
+
+  
+</body>
+</html>
