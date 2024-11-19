@@ -1,7 +1,6 @@
 const express = require('express');
 const authController = require('../controllers/authController');
 const passwordController = require('../controllers/passwordController');
-const htmlController = require('../controllers/htmlController');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 
