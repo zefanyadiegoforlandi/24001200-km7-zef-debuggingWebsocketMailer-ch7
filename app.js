@@ -8,7 +8,7 @@ if (process.env.NODE_ENV !== 'production') {
   const { Server } = require('socket.io');
   const routes = require('./routes/index');
   const path = require('path');
-  const session = require('express-session');  // Import express-session
+  const session = require('express-session');
   
   const app = express();
   const server = http.createServer(app);

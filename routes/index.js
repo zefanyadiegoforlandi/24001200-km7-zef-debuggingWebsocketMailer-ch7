@@ -5,12 +5,11 @@ const htmlController = require('../controllers/htmlController');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 
-
+//route get
 router.get('/reset-password', (req, res) => {
     const { newToken } = req.query;
     res.render('resetPassword', { newToken });
 });
-
 
 router.get('/login', (req, res) => {
     res.render('login');
@@ -38,7 +37,6 @@ router.get('/confirmation-email', (req, res) => {
     res.render('confirmationEmail', { token: token });
 });
 
-
 // Auth routes
 router.post('/api/auth/register', authController.register);
 router.post('/api/auth/login', authController.login);
@@ -47,7 +45,5 @@ router.post('/api/auth/login', authController.login);
 router.post('/api/password/forgot-password', passwordController.forgotPassword);
 router.post('/api/password/reset-password', passwordController.resetPassword);
 router.post('/api/password/confirm-email', passwordController.confirmEmail);
-
-router.post('/form/register', htmlController.handleRegisterForm); 
 
 module.exports = router;
