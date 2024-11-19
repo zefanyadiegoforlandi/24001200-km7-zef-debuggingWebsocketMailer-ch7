@@ -18,7 +18,7 @@ class PasswordController {
           const user = await prisma.user.findUnique({ where: { email } });
 
           if (!user) {
-              return res.status(404).json({ message: 'User not found' });
+              return res.status(404).json({ message: 'Invalid email or password' });
           }
 
           const token = jwt.sign({ email }, process.env.JWT_SECRET, { expiresIn: '10m' });
@@ -53,7 +53,7 @@ class PasswordController {
         }
         const user = await prisma.user.findUnique({ where: { email: decoded.email } });
         if (!user) {
-            return res.status(404).json({ message: 'User not found' });
+            return res.status(404).json({ message: 'Invalid email' });
         }
 
         const newToken = jwt.sign(
